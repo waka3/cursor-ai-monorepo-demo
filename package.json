@@ -5,7 +5,13 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md}\"",
+    "dev:vue": "pnpm --filter @frontend-monorepo/vue-app dev",
+    "dev:react": "pnpm --filter @frontend-monorepo/react-app dev",
+    "build:vue": "pnpm --filter @frontend-monorepo/vue-app build",
+    "build:react": "pnpm --filter @frontend-monorepo/react-app build",
+    "lint:vue": "pnpm --filter @frontend-monorepo/vue-app lint",
+    "lint:react": "pnpm --filter @frontend-monorepo/react-app lint"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.0",
