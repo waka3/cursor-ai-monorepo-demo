@@ -42,7 +42,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 准备部署目录
-          mkdir -p dist
+          mkdir -p dist/vue-app dist/react-app
+          
+          # 复制构建文件
           cp -r apps/vue-app/dist/* dist/vue-app/
           cp -r apps/react-app/dist/* dist/react-app/
           
@@ -76,8 +78,8 @@ jobs:
           
           # 移动构建文件到根目录
           rm -rf *
-          mv dist/* .
-          rmdir dist
+          cp -r dist/* .
+          rm -rf dist
           
           # 提交并推送
           git add .
