@@ -16,39 +16,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        run: |
+          npm install -g pnpm@8
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build UI Components
-        run: pnpm build:ui
-
-      - name: Build Vue App
-        run: pnpm build:vue
-
-      - name: Build React App
-        run: pnpm build:react
+      - name: Build
+        run: |
+          pnpm build:ui
+          pnpm build:vue
+          pnpm build:react
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: apps/vue-app/dist
-          target-folder: vue-app
-
-      - name: Deploy React App
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: apps/react-app/dist
-          target-folder: react-app 
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git checkout --orphan gh-pages
+          git reset
+          mkdir -p vue-app react-app
+          cp -r apps/vue-app/dist/* vue-app/
+          cp -r apps/react-app/dist/* react-app/
+          git add vue-app react-app
+          git commit -m "Deploy to GitHub Pages"
+          git push origin gh-pages --force 

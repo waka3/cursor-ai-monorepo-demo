@@ -9,25 +9,27 @@ const handleClick = () => {
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="app">
+    <header>
+      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <div class="wrapper">
+        <HelloWorld msg="You did it!" />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </nav>
+      </div>
+    </header>
+
+    <RouterView />
+
+    <div class="button-container">
+      <VueButton @click="handleClick">
+        Click me (Vue)
+      </VueButton>
     </div>
-  </header>
-
-  <RouterView />
-
-  <div class="button-container">
-    <VueButton @click="handleClick">
-      Click me (Vue)
-    </VueButton>
   </div>
 </template>
 

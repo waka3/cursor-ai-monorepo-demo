@@ -2,6 +2,11 @@
 defineProps<{
   msg: string
 }>()
+
+// 添加默认导出
+defineOptions({
+  name: 'HelloWorld'
+});
 </script>
 
 <template>
