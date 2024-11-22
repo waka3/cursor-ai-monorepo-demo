@@ -14,37 +14,68 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        run: |
+          git clone https://github.com/${{ github.repository }}.git .
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
-      - name: Setup Node.js
+      - name: Setup Node.js and PNPM
         run: |
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo apt-get install -y nodejs
-
-      - name: Setup PNPM
-        run: |
-          npm install -g pnpm@8
-
+          sudo npm install -g pnpm@8
+          
       - name: Install dependencies
-        run: pnpm install
-
+        run: |
+          pnpm install
+          
       - name: Build
         run: |
           pnpm build:ui
           pnpm build:vue
           pnpm build:react
-
-      - name: Deploy
+          
+      - name: Deploy to GitHub Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          # 创建一个新的孤立分支
           git checkout --orphan gh-pages
-          git reset
+          git reset --hard
+          
+          # 清理工作目录，只保留构建产物
+          git rm -rf .
           mkdir -p vue-app react-app
           cp -r apps/vue-app/dist/* vue-app/
           cp -r apps/react-app/dist/* react-app/
-          git add vue-app react-app
+          
+          # 创建 index.html 作为导航页
+          cat > index.html <<EOL
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Frontend Monorepo Demo</title>
+            <style>
+              body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+              h1 { color: #333; }
+              .links { margin-top: 20px; }
+              .links a { display: inline-block; margin: 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+              .links a:hover { background: #0056b3; }
+            </style>
+          </head>
+          <body>
+            <h1>Frontend Monorepo Demo</h1>
+            <div class="links">
+              <a href="./vue-app/">Vue App</a>
+              <a href="./react-app/">React App</a>
+            </div>
+          </body>
+          </html>
+          EOL
+          
+          # 提交并推送
+          git add -A
           git commit -m "Deploy to GitHub Pages"
-          git push origin gh-pages --force 
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages
