@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # Operating System
 .DS_Store 
+
+fix-author.sh
