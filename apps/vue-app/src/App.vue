@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { VueButton } from '@frontend-monorepo/ui-components'
+
+const handleClick = () => {
+  alert('Hello from Vue!');
+};
 </script>
 
 <template>
@@ -18,6 +23,12 @@ import HelloWorld from './components/HelloWorld.vue'
   </header>
 
   <RouterView />
+
+  <div class="button-container">
+    <VueButton @click="handleClick">
+      Click me (Vue)
+    </VueButton>
+  </div>
 </template>
 
 <style scoped>
@@ -81,5 +92,10 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
+}
+
+.button-container {
+  margin-top: 2rem;
+  text-align: center;
 }
 </style>

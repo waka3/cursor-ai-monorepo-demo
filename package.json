@@ -11,7 +11,11 @@
     "build:vue": "pnpm --filter @frontend-monorepo/vue-app build",
     "build:react": "pnpm --filter @frontend-monorepo/react-app build",
     "lint:vue": "pnpm --filter @frontend-monorepo/vue-app lint",
-    "lint:react": "pnpm --filter @frontend-monorepo/react-app lint"
+    "lint:react": "pnpm --filter @frontend-monorepo/react-app lint",
+    "build:ui": "pnpm --filter @frontend-monorepo/ui-components build",
+    "dev:ui": "pnpm --filter @frontend-monorepo/ui-components dev",
+    "build": "pnpm build:ui && pnpm build:vue && pnpm build:react",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.0",
