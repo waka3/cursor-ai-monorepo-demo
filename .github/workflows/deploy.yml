@@ -16,57 +16,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        run: |
-          git clone https://github.com/${{ github.repository }}.git .
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js and PNPM
-        run: |
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          sudo npm install -g pnpm@8
-          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
       - name: Install dependencies
-        run: |
-          pnpm install
-          
+        run: pnpm install
+
       - name: Build
         run: |
           pnpm build:ui
           pnpm build:vue
           pnpm build:react
           
-      - name: Check build output
+      - name: List build output
         run: |
-          echo "Checking Vue build output:"
-          ls -la apps/vue-app/dist/
-          echo "Checking React build output:"
-          ls -la apps/react-app/dist/
+          echo "Checking build output in root:"
+          ls -la $GITHUB_WORKSPACE
+          echo "Checking Vue app dist:"
+          ls -la $GITHUB_WORKSPACE/apps/vue-app/dist/
+          echo "Checking React app dist:"
+          ls -la $GITHUB_WORKSPACE/apps/react-app/dist/
           
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 创建临时目录
-          mkdir -p temp/vue-app temp/react-app
+          mkdir -p $GITHUB_WORKSPACE/temp/vue-app $GITHUB_WORKSPACE/temp/react-app
           
           # 复制构建文件到临时目录
-          cp -r apps/vue-app/dist/* temp/vue-app/ || echo "No Vue build files"
-          cp -r apps/react-app/dist/* temp/react-app/ || echo "No React build files"
-          
-          # 调试信息：列出 temp 目录的内容
-          echo "Contents of temp directory after copying:"
-          ls -la temp/
-          
-          # 调试信息：列出 vue-app 和 react-app 目录的内容
-          echo "Contents of temp/vue-app:"
-          ls -la temp/vue-app/
-          echo "Contents of temp/react-app:"
-          ls -la temp/react-app/
+          cp -r  $GITHUB_WORKSPACE/apps/vue-app/dist/*  $GITHUB_WORKSPACE/temp/vue-app/ || echo "No Vue build files"
+          cp -r  $GITHUB_WORKSPACE/apps/react-app/dist/*  $GITHUB_WORKSPACE/temp/react-app/ || echo "No React build files"
           
           # 创建导航页
-          cat > temp/index.html <<EOL
+          cat > $GITHUB_WORKSPACE/temp/index.html <<EOL
           <!DOCTYPE html>
           <html>
           <head>
@@ -95,9 +83,9 @@ jobs:
           
           # 清理工作目录并移动构建文件
           rm -rf ./*
-          mv temp/vue-app ./vue-app
-          mv temp/react-app ./react-app
-          rm -rf temp
+          mv  $GITHUB_WORKSPACE/temp/vue-app
+          mv  $GITHUB_WORKSPACE/temp/react-app
+          rm -rf $GITHUB_WORKSPACE/temp
           
           # 添加 .nojekyll 文件以禁用 GitHub Pages Jekyll 处理
           touch .nojekyll
@@ -106,3 +94,9 @@ jobs:
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: $GITHUB_WORKSPACE/dist/
