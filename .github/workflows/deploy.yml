@@ -37,6 +37,13 @@ jobs:
           pnpm build:vue
           pnpm build:react
           
+      - name: Check build output
+        run: |
+          echo "Checking Vue build output:"
+          ls -la apps/vue-app/dist/
+          echo "Checking React build output:"
+          ls -la apps/react-app/dist/
+          
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,9 +51,13 @@ jobs:
           # 创建临时目录
           mkdir -p temp/vue-app temp/react-app
           
-          # 复制构建文件到临时目录
+          # 复制构建文件到临时目录
           cp -r apps/vue-app/dist/* temp/vue-app/ || echo "No Vue build files"
           cp -r apps/react-app/dist/* temp/react-app/ || echo "No React build files"
+          
+          # 调试信息：列出 temp 目录的内容
+          echo "Contents of temp directory after copying:"
+          ls -la temp/
           
           # 创建导航页
           cat > temp/index.html <<EOL
@@ -88,7 +99,3 @@ jobs:
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages
-
-          # 输出构建信息
-          echo "Deployment complete. Please check the following paths:"
-          ls -la
