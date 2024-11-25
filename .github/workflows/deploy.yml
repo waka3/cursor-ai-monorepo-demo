@@ -41,15 +41,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 准备部署目录
-          mkdir -p dist/vue-app dist/react-app
+          # 创建临时目录
+          mkdir -p temp/vue-app temp/react-app
           
-          # 复制构建文件
-          cp -r apps/vue-app/dist/* dist/vue-app/
-          cp -r apps/react-app/dist/* dist/react-app/
+          # 复制构建文件到临时目录
+          cp -r apps/vue-app/dist/* temp/vue-app/ || echo "No Vue build files"
+          cp -r apps/react-app/dist/* temp/react-app/ || echo "No React build files"
           
           # 创建导航页
-          cat > dist/index.html <<EOL
+          cat > temp/index.html <<EOL
           <!DOCTYPE html>
           <html>
           <head>
@@ -76,12 +76,19 @@ jobs:
           git checkout --orphan gh-pages
           git reset --hard
           
-          # 移动构建文件到根目录
-          rm -rf *
-          cp -r dist/* .
-          rm -rf dist
+          # 清理工作目录并移动构建文件
+          rm -rf ./*
+          mv temp/* .
+          rm -rf temp
+          
+          # 添加 .nojekyll 文件以禁用 GitHub Pages Jekyll 处理
+          touch .nojekyll
           
           # 提交并推送
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages
+
+          # 输出构建信息
+          echo "Deployment complete. Please check the following paths:"
+          ls -la
