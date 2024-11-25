@@ -95,8 +95,8 @@ jobs:
           
           # 清理工作目录并移动构建文件
           rm -rf ./*
-          mv temp/vue-app ./
-          mv temp/react-app ./
+          mv temp/vue-app ./vue-app
+          mv temp/react-app ./react-app
           rm -rf temp
           
           # 添加 .nojekyll 文件以禁用 GitHub Pages Jekyll 处理
