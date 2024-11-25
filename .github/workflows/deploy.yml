@@ -59,6 +59,12 @@ jobs:
           echo "Contents of temp directory after copying:"
           ls -la temp/
           
+          # 调试信息：列出 vue-app 和 react-app 目录的内容
+          echo "Contents of temp/vue-app:"
+          ls -la temp/vue-app/
+          echo "Contents of temp/react-app:"
+          ls -la temp/react-app/
+          
           # 创建导航页
           cat > temp/index.html <<EOL
           <!DOCTYPE html>
